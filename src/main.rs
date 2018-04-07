@@ -12,14 +12,18 @@ extern crate rustc_serialize;
 use serde_json::Value;
 
 
-use std::io::Read;
+use std::io::{ Read, BufWriter};
+
+use std::fs::OpenOptions;
+
+
+use std::io::Write;
+
+
 use hyper::Client;
 
 use chrono::prelude::*;
 use time::Duration;
-
-
-
 
 fn get_content(url: &str) -> hyper::Result<String> {
     let client = Client::new();
@@ -33,10 +37,25 @@ fn main() {
     let moving_average = get_two_hundred_days_average();
     let last_price = get_latest_price();
     let multiplier = last_price / moving_average;
+    let today: DateTime<Utc> = Utc::now();
 
-    println!("{0:<15} - {1:?}", "Moving Average", moving_average);
-    println!("{0:<15} - {1:?}", "Last Price", last_price);
-    println!("{0:<15} - {1:?}", "Multiple" ,multiplier);
+
+    println!("{:?},{:?},{:?}, {}", multiplier, last_price, moving_average, today);
+
+
+    let data = format!("{:?},{:?},{:?}, {} \n", multiplier, last_price, moving_average, today);
+
+    let mut options = OpenOptions::new();
+    options.write(true).append(true);
+
+    let file = match options.open("result_mayer_multiple.csv") {
+        Ok(file) => file,
+        Err(..) => panic!("Can't open file"),
+    };
+
+    let mut writer = BufWriter::new(&file);
+    writer.write_all(data.as_bytes()).unwrap();
+
 }
 
 fn get_latest_price() -> f64{
