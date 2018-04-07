@@ -10,18 +10,12 @@ extern crate rustc_serialize;
 
 
 use serde_json::Value;
-
-
 use std::io::{ Read, BufWriter};
-
 use std::fs::OpenOptions;
-
-
 use std::io::Write;
-
-
+use std::fs;
+use std::path::PathBuf;
 use hyper::Client;
-
 use chrono::prelude::*;
 use time::Duration;
 
@@ -48,7 +42,14 @@ fn main() {
     let mut options = OpenOptions::new();
     options.write(true).append(true);
 
-    let file = match options.open("result_mayer_multiple.csv") {
+    let srcdir = PathBuf::from("./data/result_mayer_multiple.csv");
+
+    let path = match fs::canonicalize(&srcdir){
+        Ok(path) => path,
+        Err(..) => panic!("Can't find the path"),
+    };
+
+    let file = match options.open(path) {
         Ok(file) => file,
         Err(..) => panic!("Can't open file"),
     };
