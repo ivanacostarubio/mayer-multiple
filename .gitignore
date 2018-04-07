@@ -14,3 +14,5 @@ Cargo.lock
 **/*.rs.bk
 
 *.DS_Store
+
+data/results.log
