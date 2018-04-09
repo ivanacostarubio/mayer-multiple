@@ -8,4 +8,4 @@ TODAY= date;
 cd $script_full_path
 git add ./
 git commit -m "`date`"
-git push github data
+git push github master
