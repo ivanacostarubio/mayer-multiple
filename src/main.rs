@@ -10,11 +10,7 @@ extern crate rustc_serialize;
 
 
 use serde_json::Value;
-use std::io::{ Read, BufWriter};
-use std::fs::OpenOptions;
-use std::io::Write;
-use std::fs;
-use std::path::PathBuf;
+use std::io::Read;
 use hyper::Client;
 use chrono::prelude::*;
 use time::Duration;
@@ -35,28 +31,6 @@ fn main() {
 
 
     println!("{:?},{:?},{:?}, {}", multiplier, last_price, moving_average, today);
-
-
-    let data = format!("{:?},{:?},{:?}, {} \n", multiplier, last_price, moving_average, today);
-
-    let mut options = OpenOptions::new();
-    options.write(true).append(true);
-
-    let srcdir = PathBuf::from("./data/result_mayer_multiple.csv");
-
-    let path = match fs::canonicalize(&srcdir){
-        Ok(path) => path,
-        Err(..) => panic!("Can't find the path"),
-    };
-
-    let file = match options.open(path) {
-        Ok(file) => file,
-        Err(..) => panic!("Can't open file"),
-    };
-
-    let mut writer = BufWriter::new(&file);
-    writer.write_all(data.as_bytes()).unwrap();
-
 }
 
 fn get_latest_price() -> f64{
